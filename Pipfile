@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+uvicorn = "*"
+starlette = "*"
+starlette-apispec = "*"
+marshmallow-jsonapi = "*"
+tortoise-orm = "*"
+asyncpg = "*"
+
+[dev-packages]
+python-lsp-black = "*"
+pyls-flake8 = "*"
+pyls-isort = "*"
+pyls-memestra = "*"
+pylsp-mypy = "*"
+pylsp-rope = "*"
+
+[requires]
+python_version = "3.8"
+
+[packages.python-lsp-server]
+extras = [ "all",]
