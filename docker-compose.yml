@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  api:
+    container_name: api
+    image: python:3.8-alpine
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+  db:
+    container_name: db
+    image: postgres:12-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER:-user}
+      - POSTGRES_PASSWORD=${DB_PSWD:-pswd}
+      - POSTGRES_DB=${DB_NAME:-db}
+    volumes:
+      - doortec-pgdata:/var/lib/postgresql/data
+volumes:
+  doortec-pgdata:
+    external: true
