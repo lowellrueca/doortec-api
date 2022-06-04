@@ -21,7 +21,9 @@ services:
       - POSTGRES_PASSWORD=${DB_PSWD:-pswd}
       - POSTGRES_DB=${DB_NAME:-db}
     volumes:
+      - ./db/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - doortec-pgdata:/var/lib/postgresql/data
 volumes:
+  scripts:
   doortec-pgdata:
     external: true
