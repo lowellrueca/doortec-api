@@ -11,6 +11,7 @@ class AbstractBaseModel(Model):
 
 class AbstractBaseProductModel(AbstractBaseModel):
     series = fields.CharField(max_length=64)
+    price = fields.DecimalField(max_digits=8, decimal_places=2)
 
     class Meta:
         abstract = True
