@@ -1,5 +1,5 @@
 # set base image (host OS)
-FROM python:3.8-alpine
+FROM python:3.10-alpine
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
