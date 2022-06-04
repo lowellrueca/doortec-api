@@ -14,3 +14,17 @@ DB_CONFIG = {
     },
     "apps": {"models": {"models": ["service.models"]}},
 }
+
+AERICH_CONFIG = {
+    "connections": {
+        "default": get_db_url(
+            config.DB_PROV,
+            config.DB_USER,
+            str(config.DB_PSWD),
+            config.DB_HOST,
+            config.DB_PORT,
+            config.DB_NAME,
+        ),
+    },
+    "apps": {"models": {"models": ["service.models", "aerich.models"]}},
+}
