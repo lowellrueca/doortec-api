@@ -11,13 +11,5 @@ marshmallow-jsonapi = "*"
 tortoise-orm = "*"
 asyncpg = "*"
 
-[dev-packages]
-python-lsp-black = "*"
-pyls-flake8 = "*"
-pyls-isort = "*"
-pyls-memestra = "*"
-pylsp-mypy = "*"
-pylsp-rope = "*"
-
 [requires]
 python_version = "3.8"
