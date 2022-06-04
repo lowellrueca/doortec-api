@@ -21,6 +21,3 @@ pylsp-rope = "*"
 
 [requires]
 python_version = "3.8"
-
-[packages.python-lsp-server]
-extras = [ "all",]
