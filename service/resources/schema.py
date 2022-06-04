@@ -4,6 +4,7 @@ from marshmallow_jsonapi import Schema, fields
 class DoorSchema(Schema):
     id = fields.Str(dump_only=True)
     series = fields.Str()
+    price = fields.Str()
 
     class Meta:
         type_ = "door"
