@@ -2,7 +2,7 @@ version: "3.9"
 services:
   api:
     container_name: api
-    image: python:3.8-alpine
+    image: python:3.10-alpine
     build: .
     ports:
       - "8000:8000"
