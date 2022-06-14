@@ -1,6 +1,5 @@
 from starlette.applications import Starlette as App
 from starlette.routing import Mount
-from tortoise.contrib.starlette import register_tortoise
 
 def create_app():
     # imports
@@ -15,9 +14,6 @@ def create_app():
 
     # instatiate app
     app = App(debug=DEBUG, routes=routes)
-    
-    # register models
-    register_tortoise(app=app, config=DB_CONFIG, generate_schemas=True)
     
     # return app instance
     return app
