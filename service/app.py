@@ -4,7 +4,6 @@ from starlette.routing import Mount
 def create_app():
     # imports
     from service.config import DEBUG
-    from service.db import DB_CONFIG
     from service.routes import schema, door
 
     routes = [
