@@ -12,8 +12,8 @@ services:
     env_file:
       - ./.env
   db:
-    container_name: db
     image: postgres:12-alpine
+    container_name: doortec_db
     restart: always
     ports:
       - "5432:5432"
