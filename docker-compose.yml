@@ -22,7 +22,6 @@ services:
       - POSTGRES_PASSWORD=${DB_PSWD:-pswd}
       - POSTGRES_DB=${DB_NAME:-db}
     volumes:
-      - ./db/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
       - doortec-pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -30,6 +29,5 @@ services:
       timeout: 30s
       retries: 5
 volumes:
-  scripts:
   doortec-pgdata:
     external: true
