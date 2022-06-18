@@ -6,7 +6,7 @@ from starlette.requests import Request
 from starlette.routing import Route
 from starlette.responses import Response, JSONResponse
 from tortoise.exceptions import DoesNotExist
-
+from ext.pagination import default_or_paginate
 
 async def get_many(request: Request) -> Response:
     """
@@ -25,7 +25,10 @@ async def get_many(request: Request) -> Response:
     if len(doors) == 0:
         return Response(content=None, status_code=204)
 
-    content = DoorSchema(many=True).dump(doors)
+    schema = DoorSchema(many=True)
+    schema.context["request"] = request
+
+    content = await default_or_paginate(data=doors, schema=schema)
     headers = {"Content-Type": "application/vnd.api+json"}
     return JSONResponse(content=content, status_code=200, headers=headers)
 
