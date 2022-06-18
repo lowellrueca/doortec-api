@@ -5,6 +5,7 @@ class DoorSchema(Schema):
     id = fields.Str(dump_only=True)
     series = fields.Str()
     price = fields.Str()
+    metadata = fields.DocumentMeta()
 
     class Meta:
         type_ = "door"
