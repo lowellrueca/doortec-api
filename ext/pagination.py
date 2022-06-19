@@ -72,11 +72,14 @@ class Pagination:
             "links": links 
         }
 
-    def _mapped_data(self):
+    def _dump_paginate(self):
         self._init_pagination_meta()
-        data = self._slice_data()
-        mapped_attr = list(map(lambda a: {k:v for k, v in a.__dict__.items() if not (k.startswith("_"))}, data))
-        return [dict(ma, **{"metadata": self._meta}) for ma in mapped_attr] 
+
+        sliced_data = self._slice_data()
+        mapped_data = list(map(lambda a: {k:v for k, v in a.__dict__.items() if not (k.startswith("_"))}, sliced_data))
+
+        content = [dict(md, **{"metadata": self._meta}) for md in mapped_data] 
+        return self._schema.dump(content)
 
     def _dump_default(self):
         data = self._data
@@ -86,8 +89,9 @@ class Pagination:
         data: List[Any] = []
 
         if paginate:
-            data = self._mapped_data()
-            return self._schema.dump(data)
+            data = self._dump_paginate()
 
-        data = self._dump_default()
+        else:
+            data = self._dump_default()
+
         return data
