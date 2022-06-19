@@ -65,7 +65,7 @@ class Pagination:
 
         self._meta = {
             "total_items": self._total_count,
-            "item_count": self._page_size,
+            "item_count": self.page_size,
             "total_pages": self.total_pages,
             "has_next": has_next,
             "has_previous": has_previous,
