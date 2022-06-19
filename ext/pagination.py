@@ -1,75 +1,94 @@
 from math import ceil
-from typing import List, Any
-from marshmallow_jsonapi import Schema
+from typing import Any, List
 from starlette.requests import Request
+from marshmallow_jsonapi.schema import Schema
+
+
+class Pagination:
+    _meta: dict = {}
+
+    def __init__(self, data: List[Any], schema:Schema) -> None:
+        self._data = data
+        self._schema = schema
+        self._request: Request = self._schema.context["request"]
+        self._total_count: int = len(self._data)
+        self._page_number: int = 1
+        self._page_size: int = 10
+
+    @property
+    def page_number(self):
+        self._page_number = int(str(self._request.query_params.get("page_number")))
+        return self._page_number
     
+    @page_number.setter
+    def page_number(self, val):
+        self._page_number = val
 
-async def default_or_paginate(data: List[Any], schema: Schema):
-    # retrieve the request context from schema
-    request: Request = schema.context["request"]
-    url_path = request.url.path
+    @property
+    def page_size(self):
+        self._page_size = int(str(self._request.query_params.get("page_size")))
+        return self._page_size
 
-    # retrieve the query for page number and page size
-    page_number_query = request.query_params.get("page_number")
-    page_size_query = request.query_params.get("page_size")
+    @page_size.setter
+    def page_size(self, val):
+        self._page_size = val
 
-    # cast page number and page size query into integer
-    page_number = int(str(page_number_query))
-    page_size = int(str(page_size_query))
-    
-    # define start and end for paging
-    total_count = len(data)
-    start = (page_number -1) * page_size
-    end = start + page_size
+    @property
+    def total_pages(self) -> int:
+        return int(ceil(self._total_count) / float(self.page_size))
 
-    # paginate data
-    paginated_data = data[start:end]
+    def _slice_data(self) -> List[Any]:
+        start = (self.page_number - 1) * self.page_size
+        end = start + self.page_size
+        return self._data[start:end]
 
-    # define total no. of pages
-    if page_size == 0:
-        pages = 0
+    def _create_pagination_link(self, page_no: int, page_sz:int):
+        url = self._request.url
+        self.page_number = page_no
+        self.page_size = page_sz
+        return str(url.replace_query_params(page_number=self.page_number, page_size=self.page_size))
 
-    else:
-        pages = int(ceil(total_count / float(page_size)))
+    def _init_pagination_meta(self):
+        links: dict[str, Any] = {}
+        links["first"] = self._create_pagination_link(page_no=1, page_sz=self.page_size)
+        links["next"] = None
+        links["previous"] = None
+        links["last"] = self._create_pagination_link(page_no=self.total_pages, page_sz=self.page_size)
 
-    # define metadata
-    metadata = {
-        "total": total_count,
-        "count": page_size,
-        "pages": pages,
-        "links": {}
-    }
+        has_next: bool = self._page_number < self.total_pages
+        print({"page_number": self._page_number, "page_size": self.page_size})
+        if has_next:
+            links["next"] = self._create_pagination_link(page_no=self._page_number+1, page_sz=self.page_size)
 
-    # define first page
-    metadata["links"]["first"] = f"{url_path}?page_number=1&page_size={page_size}"
+        has_previous: bool = self._page_number > 1
+        if has_previous:
+            links["previous"] = self._create_pagination_link(page_no=self._page_number-1, page_sz=self.page_size)
 
-    # define last page
-    metadata["links"]["last"] = f"{url_path}?page_number={pages}&page_size={page_size}"
+        self._meta = {
+            "total_items": self._total_count,
+            "item_count": self._page_size,
+            "total_pages": self.total_pages,
+            "has_next": has_next,
+            "has_previous": has_previous,
+            "links": links 
+        }
 
-    if end >= total_count:
-        metadata["links"]["next"] = None
+    def _mapped_data(self):
+        self._init_pagination_meta()
+        data = self._slice_data()
+        mapped_attr = list(map(lambda a: {k:v for k, v in a.__dict__.items() if not (k.startswith("_"))}, data))
+        return [dict(ma, **{"metadata": self._meta}) for ma in mapped_attr] 
 
-        if page_number > 1:
-            metadata["links"]["previous"] = f"{url_path}?page_number={page_number-1}&page_size={page_size}"
-        else:
-            metadata["links"]["previous"] = None
+    def _dump_default(self):
+        data = self._data
+        return self._schema.dump(data)
 
-    else:
-        if page_number > 1:
-            metadata["links"]["previous"] = f"{url_path}?page_number={page_number-1}&page_size={page_size}"
-        else:
-            metadata["links"]["previous"] = None
-        metadata["links"]["next"] = f"{url_path}?page_number={page_number+1}&page_size={page_size}"
+    def dump(self, paginate: bool):
+        data: List[Any] = []
 
-    # map paginated data for serialization
-    mapped_data = list(map(lambda x: {
-                "id": x.id, 
-                "series": x.series, 
-                "price": x.price, 
-                "metadata": metadata}, 
-            paginated_data
-        )
-    )
+        if paginate:
+            data = self._mapped_data()
+            return self._schema.dump(data)
 
-    content = schema.dump(mapped_data)
-    return content
+        data = self._dump_default()
+        return data
