@@ -56,7 +56,6 @@ class Pagination:
         links["last"] = self._create_pagination_link(page_no=self.total_pages, page_sz=self.page_size)
 
         has_next: bool = self._page_number < self.total_pages
-        print({"page_number": self._page_number, "page_size": self.page_size})
         if has_next:
             links["next"] = self._create_pagination_link(page_no=self._page_number+1, page_sz=self.page_size)
 
